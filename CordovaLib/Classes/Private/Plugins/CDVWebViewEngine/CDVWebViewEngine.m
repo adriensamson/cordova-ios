@@ -45,6 +45,7 @@
 @property (nonatomic, strong) CDVURLSchemeHandler * schemeHandler;
 @property (nonatomic, readwrite) NSString *CDV_ASSETS_URL;
 @property (nonatomic, readwrite) Boolean cdvIsFileScheme;
+@property (nonatomic, readwrite) NSDate *lastReload;
 
 @end
 
@@ -231,6 +232,7 @@
 
     [self updateSettings:settings];
 
+    self.lastReload = [NSDate date];
     // check if content thread has died on resume
     NSLog(@"%@", @"CDVWebViewEngine will reload WKWebView if required on resume");
     [[NSNotificationCenter defaultCenter]
@@ -271,6 +273,7 @@ static void * KVOContext = &KVOContext;
     if ([self shouldReloadWebView]) {
         NSLog(@"%@", @"CDVWebViewEngine reloading!");
         [(WKWebView*)_engineWebView reload];
+        self.lastReload = [NSDate date];
     }
 }
 
@@ -284,8 +287,9 @@ static void * KVOContext = &KVOContext;
 {
     BOOL title_is_nil = (title == nil);
     BOOL location_is_blank = [[location absoluteString] isEqualToString:@"about:blank"];
+    BOOL is_old = self.lastReload.timeIntervalSinceNow < -3600;
 
-    BOOL reload = (title_is_nil || location_is_blank);
+    BOOL reload = (title_is_nil || location_is_blank || is_old);
 
 #ifdef DEBUG
     NSLog(@"%@", @"CDVWebViewEngine shouldReloadWebView::");
