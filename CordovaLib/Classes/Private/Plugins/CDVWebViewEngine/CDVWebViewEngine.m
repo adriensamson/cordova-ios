@@ -287,7 +287,7 @@ static void * KVOContext = &KVOContext;
 {
     BOOL title_is_nil = (title == nil);
     BOOL location_is_blank = [[location absoluteString] isEqualToString:@"about:blank"];
-    BOOL is_old = self.lastReload.timeIntervalSinceNow < -3600;
+    BOOL is_old = self.lastReload.timeIntervalSinceNow < -600;
 
     BOOL reload = (title_is_nil || location_is_blank || is_old);
 
